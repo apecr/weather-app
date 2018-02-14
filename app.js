@@ -14,13 +14,19 @@ const argv = yargs
   .alias('help', 'h')
   .argv;
 
-console.log(argv);
-
 request({
   url: `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(argv.address)}`,
   json: true
 }, (error, response, body) => {
-  console.log(`Address: ${body.results[0].formatted_address}`);
-  console.log(`Latitude: ${body.results[0].geometry.location.lat}`);
-  console.log(`Longitudd: ${body.results[0].geometry.location.lng}`);
+  if (error) {
+    //
+    console.log('Unable to connect to Google Servers.');
+  } else if (body.status === 'ZERO_RESULTS') {
+    //
+    console.log('Unable to find the address', argv.address);
+  } else if (body.status === 'OK') {
+    console.log(`Address: ${body.results[0].formatted_address}`);
+    console.log(`Latitude: ${body.results[0].geometry.location.lat}`);
+    console.log(`Longitudd: ${body.results[0].geometry.location.lng}`);
+  }
 });
